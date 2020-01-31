@@ -66,6 +66,10 @@ geometricCtrl::geometricCtrl(const ros::NodeHandle& nh, const ros::NodeHandle& n
 
   tau << tau_x, tau_y, tau_z;
 
+  //for emergency
+  mavLastKnownPose_ <<  0.0, 0.0, 1.0;
+  mavLastKnownAtt_ <<  1.0, 0.0, 0.0, 0.0;
+
 }
 geometricCtrl::~geometricCtrl() {
   //Destructor
@@ -161,6 +165,15 @@ void geometricCtrl::mavposeCallback(const geometry_msgs::PoseStamped& msg){
   mavAtt_(1) = msg.pose.orientation.x;
   mavAtt_(2) = msg.pose.orientation.y;
   mavAtt_(3) = msg.pose.orientation.z;
+
+  //record virtual cage escape pose
+  if (!((mavPos_(0) < MAX_X && mavPos_(0) > -MAX_X && mavPos_(1) < MAX_Y && mavPos_(1) > -MAX_Y && mavPos_(2) < MAX_Z && mavPos_(2) > -MAX_Z))){
+    mavLastKnownPose_ = mavPos_;
+    mavLastKnownAtt_(0) = msg.pose.orientation.w;
+    mavLastKnownAtt_(1) = msg.pose.orientation.x;
+    mavLastKnownAtt_(2) = msg.pose.orientation.y;
+    mavLastKnownAtt_(3) = msg.pose.orientation.z;
+  } 
 }
 
 void geometricCtrl::mavtwistCallback(const geometry_msgs::TwistStamped& msg){  
@@ -184,7 +197,26 @@ void geometricCtrl::cmdloopCallback(const ros::TimerEvent& event){
   
     if(!feedthrough_enable_)  computeBodyRateCmd(cmdBodyRate_);
     pubReferencePose(targetPos_, q_des);
-    pubRateCommands(cmdBodyRate_);
+    // if inside the cage, use different flatness attitude controller
+    if(mavPos_(0) < MAX_X && mavPos_(0) > -MAX_X && mavPos_(1) < MAX_Y && mavPos_(1) > -MAX_Y && mavPos_(2) < MAX_Z && mavPos_(2) > -MAX_Z){
+      pubRateCommands(cmdBodyRate_);
+    }
+    else{
+      // if outside the cage, resort to position controller to stay right at that point in a low altitude
+      // pubReferencePose(mavPos_, mavAtt_);   // using position to stay right at the place, but may subject to drift
+      
+      geometry_msgs::PoseStamped hover_msg;
+      hover_msg.header.stamp = ros::Time::now();
+      hover_msg.pose.position.x = mavLastKnownPose_(0);
+      hover_msg.pose.position.y = mavLastKnownPose_(1);
+      hover_msg.pose.position.z = mavLastKnownPose_(2);
+      hover_msg.pose.orientation.w = mavLastKnownAtt_(0);
+      hover_msg.pose.orientation.x = mavLastKnownAtt_(1);
+      hover_msg.pose.orientation.y = mavLastKnownAtt_(2);
+      hover_msg.pose.orientation.z = mavLastKnownAtt_(3);
+      target_pose_pub_.publish(hover_msg);
+      ROS_WARN("Out of virtual cage. Please land the drone!");
+    }
     appendPoseHistory();
     pubPoseHistory();
     break;

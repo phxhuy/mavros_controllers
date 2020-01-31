@@ -37,6 +37,13 @@
 #define MODE_BODYRATE     2
 #define MODE_BODYTORQUE   3
 
+// define virtual cage
+#define MAX_X   5.5     //7
+#define MAX_Y   5.5     //7
+#define MAX_Z   3.0     //4
+#define MAX_V   0.5
+#define MAX_RP  (M_PI / 10)
+
 using namespace std;
 using namespace Eigen;
 
@@ -105,6 +112,9 @@ class geometricCtrl
     double tau_x, tau_y, tau_z;
     double Kpos_x_, Kpos_y_, Kpos_z_, Kvel_x_, Kvel_y_, Kvel_z_;
     int posehistory_window_;
+
+    Eigen::Vector3d mavLastKnownPose_;  //for emergency
+    Eigen::Vector4d mavLastKnownAtt_; //for emergency
 
     void pubMotorCommands();
     void pubRateCommands(const Eigen::Vector4d &cmd);
