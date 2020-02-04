@@ -34,6 +34,10 @@ geometricCtrl::geometricCtrl(const ros::NodeHandle& nh, const ros::NodeHandle& n
   set_mode_client_ = nh_.serviceClient<mavros_msgs::SetMode>("/mavros/set_mode");
   land_service_ = nh_.advertiseService("land", &geometricCtrl::landCallback, this);
 
+  //for tuning controller
+  controlErrorPub_ = nh_.advertise<nav_msgs::Odometry>("control_error", 1);
+
+
   nh_private_.param<string>("mavname", mav_name_, "iris");
   nh_private_.param<int>("ctrl_mode", ctrl_mode_, MODE_BODYRATE);
   nh_private_.param<bool>("enable_sim", sim_enable_, true);
@@ -355,6 +359,17 @@ void geometricCtrl::computeBodyRateCmd(Eigen::Vector4d &bodyrate_cmd){
   q_des = acc2quaternion(a_des, mavYaw_);
   bodyrate_cmd = attcontroller(q_des, a_des, mavAtt_); //Calculate BodyRate
 
+  //For tuning the controller
+  nav_msgs::Odometry error_msg;
+  error_msg.header.stamp = ros::Time::now();
+  error_msg.pose.pose.position.x = pos_error(0);
+  error_msg.pose.pose.position.y = pos_error(1);
+  error_msg.pose.pose.position.z = pos_error(2);
+  error_msg.twist.twist.linear.x = vel_error(0);
+  error_msg.twist.twist.linear.y = vel_error(1);
+  error_msg.twist.twist.linear.z = vel_error(2);
+
+  controlErrorPub_.publish(error_msg);
 }
 
 Eigen::Vector4d geometricCtrl::quatMultiplication(const Eigen::Vector4d &q, const Eigen::Vector4d &p) {
@@ -485,35 +500,57 @@ void geometricCtrl::setFeedthrough(bool feed_through){
 
 void geometricCtrl::dynamicReconfigureCallback(geometric_controller::GeometricControllerConfig &config, uint32_t  level) {
 
-    if(max_fb_acc_ != config.max_acc){
+  if(max_fb_acc_ != config.max_acc){
 		max_fb_acc_ = config.max_acc;
-  		ROS_INFO("Reconfigure request : max_acc = %.2f ",config.max_acc);
-    }
+    ROS_INFO("Reconfigure request : max_acc = %.2f ",config.max_acc);
+  }
 	else if(Kpos_x_ != config.Kp_x){
 		Kpos_x_ = config.Kp_x;
-	   ROS_INFO("Reconfigure request : Kp_x  = %.2f  ",config.Kp_x);
+    ROS_INFO("Reconfigure request : Kp_x  = %.2f  ",config.Kp_x);
 	}
 	else if(Kpos_y_ != config.Kp_y){
 		Kpos_y_ = config.Kp_y;
-	   ROS_INFO("Reconfigure request : Kp_y  = %.2f  ",config.Kp_y);
+    ROS_INFO("Reconfigure request : Kp_y  = %.2f  ",config.Kp_y);
 	}
 	else if(Kpos_z_ != config.Kp_z){
 		Kpos_z_= config.Kp_z;
-	   ROS_INFO("Reconfigure request : Kp_z  = %.2f  ",config.Kp_z);
+    ROS_INFO("Reconfigure request : Kp_z  = %.2f  ",config.Kp_z);
 	}
 	else if(Kvel_x_ != config.Kv_x){
 		Kvel_x_ = config.Kv_x;
-	   ROS_INFO("Reconfigure request : Kv_x  = %.2f  ",config.Kv_x);
+    ROS_INFO("Reconfigure request : Kv_x  = %.2f  ",config.Kv_x);
 	}
 	else if(Kvel_y_ != config.Kv_y){
 		Kvel_y_ = config.Kv_y;
-	   ROS_INFO("Reconfigure request : Kv_y =%.2f  ",config.Kv_y);
+    ROS_INFO("Reconfigure request : Kv_y =%.2f  ",config.Kv_y);
 	}
 	else if(Kvel_z_ != config.Kv_z){
 		Kvel_z_ = config.Kv_z;
-	   ROS_INFO("Reconfigure request : Kv_z  = %.2f  ",config.Kv_z);
+    ROS_INFO("Reconfigure request : Kv_z  = %.2f  ",config.Kv_z);
 	}
 
   Kpos_ << -Kpos_x_, -Kpos_y_, -Kpos_z_;
   Kvel_ << -Kvel_x_, -Kvel_z_, -Kvel_z_;
+
+  //thrust and attitude and drag
+  if(dx_ != config.drag_dx){
+    dx_ = config.drag_dx;
+    ROS_INFO("Reconfigure request : drag_dx  = %.2f  ",config.drag_dx);
+  }
+  if(dy_ != config.drag_dy){
+    dy_ = config.drag_dy;
+    ROS_INFO("Reconfigure request : drag_dy  = %.2f  ",config.drag_dy);
+  }
+
+  if(norm_thrust_const_ != config.normalizedthrust_constant){
+    norm_thrust_const_ = config.normalizedthrust_constant;
+    ROS_INFO("Reconfigure request : normalizedthrust_constant  = %.2f  ",config.normalizedthrust_constant);
+  }
+
+  if(norm_thrust_offset_ != config.normalizedthrust_offset){
+    norm_thrust_offset_ = config.normalizedthrust_offset;
+    ROS_INFO("Reconfigure request : normalizedthrust_offset  = %.2f  ",config.normalizedthrust_offset);
+  }
+
+  // nh_private_.param<double>("attctrl_constant", attctrl_tau_, 0.1);
 }

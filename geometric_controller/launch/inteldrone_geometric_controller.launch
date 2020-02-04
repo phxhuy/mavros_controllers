@@ -58,4 +58,7 @@
 
   <include file="$(find vicon_bridge)/launch/vicon.launch"/>
 
+  <!-- use vicon for state estimator   -->
+  <node name="vicon_feeder" pkg="global_planner" type="vicon_feed" output="screen"/>
+
 </launch>

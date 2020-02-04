@@ -81,6 +81,7 @@ class geometricCtrl
     ros::ServiceServer land_service_;
     ros::Timer cmdloop_timer_, statusloop_timer_;
     ros::Time last_request_, reference_request_now_, reference_request_last_;
+    ros::Publisher controlErrorPub_, distanceErrorPub_;  //for tuning the controller
 
     string mav_name_;
     bool fail_detec_, ctrl_enable_, feedthrough_enable_;
