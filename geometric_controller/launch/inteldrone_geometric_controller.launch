@@ -18,13 +18,13 @@
         <remap from="command/bodyrate_command" to="/mavros/setpoint_raw/attitude"/>
         <param name="ctrl_mode" value="$(arg command_input)" />
         <param name="enable_sim" value="false" />
-        <param name="max_acc" value="2.73" />
-        <param name="Kp_x" value="1.9" />
-        <param name="Kp_y" value="1.9" />
+        <param name="max_acc" value="3.9" />
+        <param name="Kp_x" value="3.2" />
+        <param name="Kp_y" value="3.2" />
         <param name="Kp_z" value="3.0" />
-        <param name="Kv_x" value="1.3" />
-        <param name="Kv_y" value="1.3" />
-        <param name="Kv_z" value="2.6" />
+        <param name="Kv_x" value="1.4" />
+        <param name="Kv_y" value="1.4" />
+        <param name="Kv_z" value="3.0" />
   </node>
 
   <!-- Launch rqt_reconfigure -->
@@ -60,5 +60,8 @@
 
   <!-- use vicon for state estimator   -->
   <node name="vicon_feeder" pkg="global_planner" type="vicon_feed" output="screen"/>
+
+  <!-- camera launch -->
+  <include file="$(find realsense_camera)/launch/r200_nodelet_default.launch"/>
 
 </launch>

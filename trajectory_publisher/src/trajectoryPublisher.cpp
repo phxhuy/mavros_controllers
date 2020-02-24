@@ -20,7 +20,7 @@ trajectoryPublisher::trajectoryPublisher(const ros::NodeHandle& nh, const ros::N
   mavtwistSub_ = nh_.subscribe("/mavros/local_position/velocity", 1, &trajectoryPublisher::mavtwistCallback, this,ros::TransportHints().tcpNoDelay());
 
   trajloop_timer_ = nh_.createTimer(ros::Duration(0.1), &trajectoryPublisher::loopCallback, this);
-  refloop_timer_ = nh_.createTimer(ros::Duration(0.01), &trajectoryPublisher::refCallback, this);
+  refloop_timer_ = nh_.createTimer(ros::Duration(0.01), &trajectoryPublisher::refCallback, this);  // 0.01
 
   trajtriggerServ_ = nh_.advertiseService("start", &trajectoryPublisher::triggerCallback, this);
 
@@ -104,7 +104,7 @@ void trajectoryPublisher::pubrefTrajectory(int selector){
   refTrajectory_ = motionPrimitives_.at(selector)->getSegment();
   refTrajectory_.header.stamp = ros::Time::now();
   refTrajectory_.header.frame_id = "map";
-  trajectoryPub_.publish(refTrajectory_);
+  // trajectoryPub_.publish(refTrajectory_);
 
 }
 
@@ -130,7 +130,7 @@ void trajectoryPublisher::pubrefState(){
   msg.twist.linear.x = v_targ(0);
   msg.twist.linear.y = v_targ(1);
   msg.twist.linear.z = v_targ(2);
-  referencePub_.publish(msg);
+  // referencePub_.publish(msg);
 }
 
 void trajectoryPublisher::pubflatrefState(){
@@ -162,7 +162,7 @@ void trajectoryPublisher::pubrefSetpointRaw(){
   msg.velocity.x = v_targ(0);
   msg.velocity.y = v_targ(1);
   msg.velocity.z = v_targ(2);
-  rawreferencePub_.publish(msg);
+  // rawreferencePub_.publish(msg);
 
 }
 
