@@ -542,10 +542,10 @@ void geometricCtrl::dynamicReconfigureCallback(geometric_controller::GeometricCo
     ROS_INFO("Reconfigure request : drag_dy  = %.2f  ",config.drag_dy);
   }
 
-  if(norm_thrust_const_ != config.normalizedthrust_constant){
-    norm_thrust_const_ = config.normalizedthrust_constant;
-    ROS_INFO("Reconfigure request : normalizedthrust_constant  = %.2f  ",config.normalizedthrust_constant);
-  }
+  // if(norm_thrust_const_ != config.normalizedthrust_constant){
+  //   norm_thrust_const_ = config.normalizedthrust_constant;
+  //   ROS_INFO("Reconfigure request : normalizedthrust_constant  = %.2f  ",config.normalizedthrust_constant);
+  // }
 
   if(norm_thrust_offset_ != config.normalizedthrust_offset){
     norm_thrust_offset_ = config.normalizedthrust_offset;
