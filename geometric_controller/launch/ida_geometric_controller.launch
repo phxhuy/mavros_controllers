@@ -18,12 +18,12 @@
         <remap from="command/bodyrate_command" to="/mavros/setpoint_raw/attitude"/>
         <param name="ctrl_mode" value="$(arg command_input)" />
         <param name="enable_sim" value="false" />
-        <param name="max_acc" value="3.9" />
-        <param name="Kp_x" value="3.78" />
-        <param name="Kp_y" value="3.78" />
-        <param name="Kp_z" value="3.38" />
-        <param name="Kv_x" value="3.18" />
-        <param name="Kv_y" value="3.18" />
+        <param name="max_acc" value="4.8" />
+        <param name="Kp_x" value="5.97" />
+        <param name="Kp_y" value="5.97" />
+        <param name="Kp_z" value="4.0" />
+        <param name="Kv_x" value="3.2" />
+        <param name="Kv_y" value="3.2" />
         <param name="Kv_z" value="3.0" />
   </node>
 
