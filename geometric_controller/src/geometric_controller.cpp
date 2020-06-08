@@ -156,6 +156,15 @@ void geometricCtrl::multiDOFJointCallback(const trajectory_msgs::MultiDOFJointTr
   targetAcc_ << pt.accelerations[0].linear.x, pt.accelerations[0].linear.y, pt.accelerations[0].linear.z;
   targetJerk_ = Eigen::Vector3d::Zero();
   targetSnap_ = Eigen::Vector3d::Zero();
+
+  Eigen::Quaterniond q;
+  q.x() = pt.transforms[0].rotation.x;
+  q.y() = pt.transforms[0].rotation.y;
+  q.z() = pt.transforms[0].rotation.z;
+  q.w() = pt.transforms[0].rotation.w;
+  auto euler = q.toRotationMatrix().eulerAngles(0, 1, 2);
+  mavYaw_ = euler(2);  // get yaw angle
+  std::cout << "Desired yaw = "<< mavYaw_ << std::endl;
 }
 
 void geometricCtrl::mavposeCallback(const geometry_msgs::PoseStamped& msg){
