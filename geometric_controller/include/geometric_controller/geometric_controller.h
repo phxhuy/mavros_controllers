@@ -38,10 +38,10 @@
 #define MODE_BODYTORQUE   3
 
 // define virtual cage
-#define MAX_X   5.5     //7
-#define MAX_Y   5.5     //7
-#define MAX_Z   3.0     //4
-#define MAX_V   0.5
+#define MAX_X   5.9     //7
+#define MAX_Y   5.9     //7
+#define MAX_Z   3.2     //4
+
 #define MAX_RP  (M_PI / 10)
 
 using namespace std;

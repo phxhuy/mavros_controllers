@@ -25,6 +25,7 @@
         <param name="Kv_x" value="3.2" />
         <param name="Kv_y" value="3.2" />
         <param name="Kv_z" value="3.0" />
+        <param name="normalizedthrust_offset" value="0.11" />
   </node>
 
   <!-- Launch rqt_reconfigure -->
@@ -42,6 +43,9 @@
     <rosparam command="load" file="$(arg pluginlists_yaml)" />
     <rosparam command="load" file="$(arg config_yaml)" />
   </node>
+
+  <!-- Launch camera -->
+  <include file="$(find spinnaker_camera_driver)/launch/nodelet_color_cam.launch"/>
 
   <!-- use vicon for state estimator   -->
   <!-- <include file="$(find vicon_bridge)/launch/vicon.launch"/> -->
