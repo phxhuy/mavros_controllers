@@ -62,7 +62,7 @@ geometricCtrl::geometricCtrl(const ros::NodeHandle& nh, const ros::NodeHandle& n
   nh_private_.param<int>("posehistory_window", posehistory_window_, 200);
 
   // targetPos_ << 0.0, 0.0, 2.0; //Initial Position
-  targetPos_ << 0.31, 4.0, 1.95; //Initial Position for drone racing
+  targetPos_ << -0.8, 4.9, 1.95; //Initial Position for drone racing
 
   mavAtt_ << 0.9800666, 0, 0, -0.1986693;
 
