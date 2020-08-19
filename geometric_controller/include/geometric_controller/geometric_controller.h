@@ -14,6 +14,7 @@
 
 #include <Eigen/Dense>
 #include <std_msgs/Float32.h>
+#include <std_msgs/Bool.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <geometry_msgs/Twist.h>
 #include <geometry_msgs/TwistStamped.h>
@@ -71,6 +72,8 @@ class geometricCtrl
     ros::Subscriber mavposeSub_, gzmavposeSub_;
     ros::Subscriber mavtwistSub_;
     ros::Subscriber yawreferenceSub_;
+    ros::Subscriber emergencySub_;  // for emergency stop the drone
+
     ros::Publisher rotorVelPub_, angularVelPub_, target_pose_pub_;
     ros::Publisher referencePosePub_;
     ros::Publisher posehistoryPub_;
@@ -143,6 +146,9 @@ class geometricCtrl
     void computeBodyRateCmd(Eigen::Vector4d &bodyrate_cmd);
     Eigen::Vector4d quatMultiplication(const Eigen::Vector4d &q, const Eigen::Vector4d &p);
     Eigen::Vector4d attcontroller(const Eigen::Vector4d &ref_att, const Eigen::Vector3d &ref_acc, Eigen::Vector4d &curr_att);
+
+    void emergencyLandCallback(const std_msgs::Bool& msg);
+
 
     inline Eigen::Vector3d toEigen(const geometry_msgs::Point& p) {
       Eigen::Vector3d ev3(p.x, p.y, p.z);

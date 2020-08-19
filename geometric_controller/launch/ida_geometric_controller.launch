@@ -25,7 +25,7 @@
         <param name="Kv_x" value="3.2" />
         <param name="Kv_y" value="3.2" />
         <param name="Kv_z" value="3.0" />
-        <param name="normalizedthrust_offset" value="0.11" />
+        <param name="normalizedthrust_offset" value="0.16" />
   </node>
 
   <!-- Launch rqt_reconfigure -->

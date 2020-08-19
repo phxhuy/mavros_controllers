@@ -34,6 +34,9 @@ geometricCtrl::geometricCtrl(const ros::NodeHandle& nh, const ros::NodeHandle& n
   set_mode_client_ = nh_.serviceClient<mavros_msgs::SetMode>("/mavros/set_mode");
   land_service_ = nh_.advertiseService("land", &geometricCtrl::landCallback, this);
 
+  emergencySub_=nh_.subscribe("/racer_interface/emergency_status",1, &geometricCtrl::emergencyLandCallback,this,ros::TransportHints().tcpNoDelay()); // For immediately landing the drone from user interface
+
+
   //for tuning controller
   controlErrorPub_ = nh_.advertise<nav_msgs::Odometry>("control_error", 1);
 
@@ -199,6 +202,12 @@ bool geometricCtrl::landCallback(std_srvs::SetBool::Request& request, std_srvs::
   node_state = LANDING;
 }
 
+void geometricCtrl::emergencyLandCallback(const std_msgs::Bool& msg) {
+  if ( msg.data == true )
+    node_state = LANDING;
+    ROS_INFO("Emergency State detected. Land the drone immediately");
+}
+
 void geometricCtrl::cmdloopCallback(const ros::TimerEvent& event){
   switch (node_state) {
   case WAITING_FOR_HOME_POSE:
@@ -236,8 +245,16 @@ void geometricCtrl::cmdloopCallback(const ros::TimerEvent& event){
   case LANDING: {
     geometry_msgs::PoseStamped landingmsg;
     landingmsg.header.stamp = ros::Time::now();
-    landingmsg.pose = home_pose_;
-    landingmsg.pose.position.z = landingmsg.pose.position.z + 1.0;
+    // landingmsg.pose = home_pose_;
+    // landingmsg.pose.position.z = landingmsg.pose.position.z + 1.0;
+    landingmsg.pose.position.x = mavPos_(0);
+    landingmsg.pose.position.y = mavPos_(1);
+    landingmsg.pose.position.z = 0.3;
+    landingmsg.pose.orientation.w = mavAtt_(0);
+    landingmsg.pose.orientation.x = mavAtt_(1);
+    landingmsg.pose.orientation.y = mavAtt_(2);
+    landingmsg.pose.orientation.z = mavAtt_(3);
+
     target_pose_pub_.publish(landingmsg);
     node_state = LANDED;
     ros::spinOnce();
