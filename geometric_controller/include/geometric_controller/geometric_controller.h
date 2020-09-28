@@ -39,8 +39,8 @@
 #define MODE_BODYTORQUE   3
 
 // define virtual cage
-#define MAX_X   5.9     //7
-#define MAX_Y   5.9     //7
+#define MAX_X   6.1     //5.9 //7
+#define MAX_Y   6.1     //5.9 //7
 #define MAX_Z   3.2     //4
 
 #define MAX_RP  (M_PI / 10)
