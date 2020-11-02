@@ -1,0 +1,10 @@
+<launch>
+  <!-- Launch camera -->
+  <!-- <include file="$(find spinnaker_camera_driver)/launch/nodelet_color_cam.launch"/> -->
+
+  <!-- use T265 for state estimator   -->
+  <include file="$(find realsense2_camera)/launch/rs_t265.launch"/>
+  <node pkg="tf" type="static_transform_publisher" name="tf_map_tracker_odom" args="0 0 2 0 0 0 map tracker_odom_frame 1000"/>
+  <node pkg="tf" type="static_transform_publisher" name="tf_tracker_link_to_baseLink" args="0.0 0.0 -0.01 0 -1.11 0 tracker_link drone_base_link 1000"/>
+
+</launch>
